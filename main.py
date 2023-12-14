@@ -4,7 +4,7 @@ from random import randrange
 
 
 
-WIDTH, HEIGHT = 900, 500
+WIDTH, HEIGHT = 900, 495
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Citrus Slicer!")
 
@@ -22,19 +22,32 @@ BOMB_IMAGE = pygame.image.load(os.path.join('Assets','bomb.png'))
 BOMB_SPRITE = pygame.transform.scale(BOMB_IMAGE, (BOMB_WIDTH, BOMB_HEIGHT))
 
 ORANGE_IMAGE = pygame.image.load(os.path.join('Assets','orange.png'))
-ORANGE_SPRITE= pygame.transform.scale(ORANGE_IMAGE,(ORANGE_WIDTH, ORANGE_HEIGHT))
+ORANGE_SPRITE = pygame.transform.scale(ORANGE_IMAGE,(ORANGE_WIDTH, ORANGE_HEIGHT))
 
-def draw_window(chef_position, bomb_position, orange_position):
-    WIN.fill((66, 245, 233))
+BG_IMAGE = pygame.image.load(os.path.join('Assets','kitchen_floor.png'))
+
+fruit_x = 900
+fruit_y = randrange(HEIGHT)
+
+bomb_x = 900
+bomb_y = randrange(HEIGHT)
+
+# def spawn_bomb(x,y):
+#     WIN.blit(BOMB_SPRITE, (x,y))
+
+
+def draw_window(chef_position, bomb_x, bomb_y):
+    WIN.blit(BG_IMAGE,(0,0))
     WIN.blit(CHEF_SPRITE, (chef_position.x, chef_position.y))
-    WIN.blit(BOMB_SPRITE,(bomb_position.x, bomb_position.y))
-    WIN.blit(ORANGE_SPRITE,(orange_position.x, orange_position.y) )
+    WIN.blit(BOMB_SPRITE, (bomb_x, bomb_y))
     pygame.display.update()
 
 def main():
-    bomb_position =pygame.Rect(900, 200, BOMB_WIDTH, BOMB_HEIGHT)
+    
     chef_position =pygame.Rect(100,200, CHEF_WIDTH, CHEF_HEIGHT)
-    orange_position = pygame.Rect(900, 250, ORANGE_WIDTH, ORANGE_HEIGHT)
+    bomb_x = 900
+    bomb_y = randrange(HEIGHT)
+
 
 
     clock = pygame.time.Clock()
@@ -54,11 +67,14 @@ def main():
             chef_position.y -= VEL
         if keys_pressed[pygame.K_s]: #down
             chef_position.y += VEL
+        
+        bomb_x -= 3
+        if bomb_x <= 0:
+            bomb_x = 900
+            bomb_y = randrange(HEIGHT)
 
-        bomb_position.x -= 3
-        orange_position.x -= 3
-
-        draw_window(chef_position, bomb_position, orange_position)
+        draw_window(chef_position, bomb_x, bomb_y)
+        # spawn_bomb(bomb_x, bomb_y)
 
     pygame.quit()
 
