@@ -32,14 +32,14 @@ fruit_y = randrange(HEIGHT)
 bomb_x = 900
 bomb_y = randrange(HEIGHT)
 
-# def spawn_bomb(x,y):
-#     WIN.blit(BOMB_SPRITE, (x,y))
 
 
-def draw_window(chef_position, bomb_x, bomb_y):
+
+def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
     WIN.blit(BG_IMAGE,(0,0))
     WIN.blit(CHEF_SPRITE, (chef_position.x, chef_position.y))
     WIN.blit(BOMB_SPRITE, (bomb_x, bomb_y))
+    WIN.blit(ORANGE_SPRITE, (fruit_x, fruit_y))
     pygame.display.update()
 
 def main():
@@ -47,7 +47,8 @@ def main():
     chef_position =pygame.Rect(100,200, CHEF_WIDTH, CHEF_HEIGHT)
     bomb_x = 900
     bomb_y = randrange(HEIGHT)
-
+    fruit_x = 900
+    fruit_y = 900
 
 
     clock = pygame.time.Clock()
@@ -73,8 +74,13 @@ def main():
             bomb_x = 900
             bomb_y = randrange(HEIGHT)
 
-        draw_window(chef_position, bomb_x, bomb_y)
-        # spawn_bomb(bomb_x, bomb_y)
+        fruit_x -= 3
+        if fruit_x <= 0:
+            fruit_x = 900
+            fruit_y = randrange(HEIGHT)
+
+        draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y)
+        
 
     pygame.quit()
 
