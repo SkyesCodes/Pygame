@@ -1,5 +1,8 @@
 import pygame
 import os
+from random import randrange
+
+
 
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -29,7 +32,7 @@ def draw_window(chef_position, bomb_position, orange_position):
     pygame.display.update()
 
 def main():
-    bomb_position =pygame.Rect(900,200, BOMB_WIDTH, BOMB_HEIGHT)
+    bomb_position =pygame.Rect(900, 200, BOMB_WIDTH, BOMB_HEIGHT)
     chef_position =pygame.Rect(100,200, CHEF_WIDTH, CHEF_HEIGHT)
     orange_position = pygame.Rect(900, 250, ORANGE_WIDTH, ORANGE_HEIGHT)
 
