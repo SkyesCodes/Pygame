@@ -6,6 +6,7 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Citrus Slicer!")
 
 FPS = 60
+VEL = 5
 
 CHEF_WIDTH, CHEF_HEIGHT = 80, 100
 
@@ -30,7 +31,16 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        chef_position.x += 1
+        keys_pressed = pygame.key.get_pressed()
+        if keys_pressed[pygame.K_a]: #left
+            chef_position.x -= VEL
+        if keys_pressed[pygame.K_d]: #right
+            chef_position.x += VEL
+        if keys_pressed[pygame.K_w]: #up
+            chef_position.y -= VEL
+        if keys_pressed[pygame.K_s]: #down
+            chef_position.y += VEL
+
         draw_window(chef_position)
 
     pygame.quit()
