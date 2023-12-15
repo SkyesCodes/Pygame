@@ -1,6 +1,6 @@
 import pygame
 import os
-from random import randrange, uniform
+from random import randrange, uniform, choice
 
 WIDTH, HEIGHT = 900, 495
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -11,13 +11,12 @@ VEL = 5
 
 CHEF_WIDTH, CHEF_HEIGHT = 70, 90
 BOMB_WIDTH, BOMB_HEIGHT = 50, 50
+
 ORANGE_WIDTH, ORANGE_HEIGHT = 32, 32
 WATERMELON_WIDTH, WATERMELON_HEIGHT = 40, 40
 PINEAPPLE_WIDTH, PINEAPPLE_HEIGHT = 38, 38
 BANANA_WIDTH, BANANA_HEIGHT = 38, 38
-STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 25, 25
-
-
+STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 15, 15
 
 CHEF_IMAGE = pygame.image.load(os.path.join('Assets', 'Chef2.gif'))
 CHEF_SPRITE = pygame.transform.scale(CHEF_IMAGE, (CHEF_WIDTH, CHEF_HEIGHT))
@@ -25,23 +24,17 @@ CHEF_SPRITE = pygame.transform.scale(CHEF_IMAGE, (CHEF_WIDTH, CHEF_HEIGHT))
 BOMB_IMAGE = pygame.image.load(os.path.join('Assets', 'bomb.png'))
 BOMB_SPRITE = pygame.transform.scale(BOMB_IMAGE, (BOMB_WIDTH, BOMB_HEIGHT))
 
-ORANGE_IMAGE = pygame.image.load(os.path.join('Assets', 'orange.png'))
-ORANGE_SPRITE = pygame.transform.scale(ORANGE_IMAGE, (ORANGE_WIDTH, ORANGE_HEIGHT))
-
 BG_IMAGE = pygame.image.load(os.path.join('Assets', 'kitchen_floor.png'))
 
-WATERMELON_IMAGE =  pygame.image.load(os.path.join('Assets', 'watermelon.png'))
+ORANGE_IMAGE = pygame.image.load(os.path.join('Assets', 'orange.png'))
 
+WATERMELON_IMAGE = pygame.image.load(os.path.join('Assets', 'watermelon.png'))
 
 STRAWBERRY_IMAGE = pygame.image.load(os.path.join('Assets', 'strawberry.png'))
 
-
 PINEAPPLE_IMAGE = pygame.image.load(os.path.join('Assets', 'pineapple.png'))
 
-
 BANANA_IMAGE = pygame.image.load(os.path.join('Assets', 'banana.png'))
-
-
 
 class Chef:
     def __init__(self, x, y):
@@ -64,12 +57,13 @@ class Chef:
         WIN.blit(CHEF_SPRITE, (self.x, self.y))
 
 class Fruit:
-    def __init__(self, image, width, height, speed):
+    def __init__(self, images, width, height, speed):
         self.x = WIDTH
         self.y = randrange(HEIGHT)
-        self.image = pygame.transform.scale(image, (width, height))
+        self.images = [pygame.transform.scale(img, (width, height)) for img in images]
+        self.image = choice(self.images)
         self.speed = speed
-        self.spawn_timer = uniform(0.25, 0.5)  # Random initial timer
+        self.spawn_timer = uniform(0.25, 0.5)
         self.fruits_on_screen = []
 
     def move(self):
@@ -80,7 +74,7 @@ class Fruit:
 
     def spawn_fruit(self):
         if len(self.fruits_on_screen) < 10:
-            self.fruits_on_screen.append(Fruit(ORANGE_IMAGE, ORANGE_WIDTH, ORANGE_HEIGHT, 3))
+            self.fruits_on_screen.append(Fruit([ORANGE_IMAGE, WATERMELON_IMAGE, STRAWBERRY_IMAGE, PINEAPPLE_IMAGE, BANANA_IMAGE], 38, 38, 3))
 
     def draw(self):
         for fruit in self.fruits_on_screen:
@@ -93,7 +87,7 @@ class Bomb:
         self.y = randrange(HEIGHT)
         self.image = pygame.transform.scale(image, (width, height))
         self.speed = speed
-        self.spawn_timer = uniform(0.25, 0.5)  # Random initial timer
+        self.spawn_timer = uniform(0.25, 0.5)
         self.bombs_on_screen = []
 
     def move(self):
@@ -111,17 +105,17 @@ class Bomb:
             bomb.move()
             WIN.blit(bomb.image, (bomb.x, bomb.y))
 
-def draw_window(chef, bomb, orange):
+def draw_window(chef, bomb, fruit):
     WIN.blit(BG_IMAGE, (0, 0))
     chef.draw()
     bomb.draw()
-    orange.draw()
+    fruit.draw()
     pygame.display.update()
 
 def main():
     chef = Chef(100, 200)
     bomb = Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5)
-    orange = Fruit(ORANGE_IMAGE, ORANGE_WIDTH, ORANGE_HEIGHT, 3)
+    fruit = Fruit([ORANGE_IMAGE, WATERMELON_IMAGE, STRAWBERRY_IMAGE, PINEAPPLE_IMAGE, BANANA_IMAGE], 38, 38, 3)
 
     clock = pygame.time.Clock()
     run = True
@@ -135,20 +129,20 @@ def main():
         chef.move(keys_pressed)
 
         bomb.move()
-        orange.move()
+        fruit.move()
 
         bomb.spawn_timer -= 1 / FPS
-        orange.spawn_timer -= 1 / FPS
+        fruit.spawn_timer -= 1 / FPS
 
         if bomb.spawn_timer <= 0:
             bomb.spawn_bomb()
             bomb.spawn_timer = uniform(0.25, 0.5)
 
-        if orange.spawn_timer <= 0:
-            orange.spawn_fruit()
-            orange.spawn_timer = uniform(0.25, 0.5)
+        if fruit.spawn_timer <= 0:
+            fruit.spawn_fruit()
+            fruit.spawn_timer = uniform(0.25, 0.5)
 
-        draw_window(chef, bomb, orange)
+        draw_window(chef, bomb, fruit)
 
     pygame.quit()
 
