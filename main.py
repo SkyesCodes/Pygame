@@ -51,7 +51,7 @@ def main():
     bomb_x = 900
     bomb_y = randrange(HEIGHT)
     fruit_x = 900
-    fruit_y = 900
+    fruit_y = randrange(HEIGHT)
 
 
     clock = pygame.time.Clock()
