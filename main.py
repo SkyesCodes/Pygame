@@ -42,6 +42,9 @@ def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
     WIN.blit(ORANGE_SPRITE, (fruit_x, fruit_y))
     pygame.display.update()
 
+
+    
+
 def main():
     
     chef_position =pygame.Rect(100,200, CHEF_WIDTH, CHEF_HEIGHT)
