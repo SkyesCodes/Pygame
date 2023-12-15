@@ -1,6 +1,6 @@
 import pygame
 import os
-from random import randrange
+from random import randrange, uniform
 
 WIDTH, HEIGHT = 900, 495
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -30,6 +30,8 @@ class Fruit:
         self.y = randrange(HEIGHT)
         self.image = pygame.transform.scale(image, (width, height))
         self.speed = speed
+        self.spawn_timer = uniform(0.25, 0.5)  # Random initial timer
+        self.fruits_on_screen = []
 
     def move(self):
         self.x -= self.speed
@@ -37,8 +39,14 @@ class Fruit:
             self.x = WIDTH
             self.y = randrange(HEIGHT)
 
+    def spawn_fruit(self):
+        if len(self.fruits_on_screen) < 10:
+            self.fruits_on_screen.append(Fruit(ORANGE_IMAGE, ORANGE_WIDTH, ORANGE_HEIGHT, 3))
+
     def draw(self):
-        WIN.blit(self.image, (self.x, self.y))
+        for fruit in self.fruits_on_screen:
+            fruit.move()
+            WIN.blit(fruit.image, (fruit.x, fruit.y))
 
 class Bomb:
     def __init__(self, image, width, height, speed):
@@ -46,6 +54,8 @@ class Bomb:
         self.y = randrange(HEIGHT)
         self.image = pygame.transform.scale(image, (width, height))
         self.speed = speed
+        self.spawn_timer = uniform(0.25, 0.5)  # Random initial timer
+        self.bombs_on_screen = []
 
     def move(self):
         self.x -= self.speed
@@ -53,8 +63,14 @@ class Bomb:
             self.x = WIDTH
             self.y = randrange(HEIGHT)
 
+    def spawn_bomb(self):
+        if len(self.bombs_on_screen) < 5:
+            self.bombs_on_screen.append(Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5))
+
     def draw(self):
-        WIN.blit(self.image, (self.x, self.y))
+        for bomb in self.bombs_on_screen:
+            bomb.move()
+            WIN.blit(bomb.image, (bomb.x, bomb.y))
 
 def draw_window(chef_position, bomb, orange):
     WIN.blit(BG_IMAGE, (0, 0))
@@ -88,6 +104,17 @@ def main():
 
         bomb.move()
         orange.move()
+
+        bomb.spawn_timer -= 1 / FPS
+        orange.spawn_timer -= 1 / FPS
+
+        if bomb.spawn_timer <= 0:
+            bomb.spawn_bomb()
+            bomb.spawn_timer = uniform(0.25, 0.5)
+
+        if orange.spawn_timer <= 0:
+            orange.spawn_fruit()
+            orange.spawn_timer = uniform(0.25, 0.5)
 
         draw_window(chef_position, bomb, orange)
 
