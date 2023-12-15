@@ -32,7 +32,8 @@ fruit_y = randrange(HEIGHT)
 bomb_x = 900
 bomb_y = randrange(HEIGHT)
 
-
+#class Fruit:
+    #use class to set up everything the current orange is doing, use time interval to spawn fruits from an array, for loop for iterating through array at random.
 
 
 def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
@@ -42,8 +43,6 @@ def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
     WIN.blit(ORANGE_SPRITE, (fruit_x, fruit_y))
     pygame.display.update()
 
-
-    
 
 def main():
     
@@ -72,7 +71,7 @@ def main():
         if keys_pressed[pygame.K_s]: #down
             chef_position.y += VEL
         
-        bomb_x -= 3
+        bomb_x -= 5
         if bomb_x <= 0:
             bomb_x = 900
             bomb_y = randrange(HEIGHT)
