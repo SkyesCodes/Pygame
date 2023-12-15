@@ -47,7 +47,7 @@ def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
     WIN.blit(BG_IMAGE,(0,0))
     WIN.blit(CHEF_SPRITE, (chef_position.x, chef_position.y))
     WIN.blit(BOMB_SPRITE, (bomb_x, bomb_y))
-    # WIN.blit(ORANGE_SPRITE, (fruit_x, fruit_y))
+    WIN.blit(ORANGE_SPRITE, (fruit_x, fruit_y))
     pygame.display.update()
 
 
