@@ -34,6 +34,9 @@ bomb_y = randrange(HEIGHT)
 
 #class Fruit:
     #use class to set up everything the current orange is doing, use time interval to spawn fruits from an array, for loop for iterating through array at random.
+#class Bomb:
+#Class Chef:
+
 
 
 def draw_window(chef_position, bomb_x, bomb_y, fruit_x, fruit_y):
