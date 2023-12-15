@@ -145,6 +145,7 @@ def check_collision(chef, bomb, fruit):
         if chef.hitbox.colliderect(fruit_instance.hitbox):
             chef.score += fruit_instance.points
             fruit.fruits_on_screen.remove(fruit_instance)
+
     for bomb_instance in bomb.bombs_on_screen[:]:
         if chef.hitbox.colliderect(bomb_instance.hitbox):
             chef.lives -= 1
@@ -167,24 +168,38 @@ def main():
         keys_pressed = pygame.key.get_pressed()
         chef.move(keys_pressed)
 
-        bomb.move()
-        fruit.move()
+        if chef.lives > 0:
+            bomb.move()
+            fruit.move()
 
-        bomb.spawn_timer -= 1 / FPS
-        fruit.spawn_timer -= 1 / FPS
+            bomb.spawn_timer -= 1 / FPS
+            fruit.spawn_timer -= 1 / FPS
 
-        if bomb.spawn_timer <= 0:
-            bomb.spawn_bomb(chef)
-            bomb.spawn_timer = uniform(0.25, 0.5)
+            if bomb.spawn_timer <= 0:
+                bomb.spawn_bomb(chef)
+                bomb.spawn_timer = uniform(0.25, 0.5)
 
-        if fruit.spawn_timer <= 0:
-            fruit.spawn_fruit(chef)
-            fruit.spawn_timer = uniform(0.25, 0.5)
+            if fruit.spawn_timer <= 0:
+                fruit.spawn_fruit(chef)
+                fruit.spawn_timer = uniform(0.25, 0.5)
 
-        check_collision(chef, bomb, fruit)
+            check_collision(chef, bomb, fruit)
+        else:
+            fruit.fruits_on_screen = []
+            bomb.bombs_on_screen = []
+
         draw_window(chef, bomb, fruit)
+
+        if chef.lives <= 0:
+            font = pygame.font.Font(None, 74)
+            game_over_text = font.render("GAME OVER", True, (255, 0, 0))
+            WIN.blit(game_over_text, ((WIDTH - game_over_text.get_width()) // 2, HEIGHT // 3))
+            pygame.display.update()
+            pygame.time.delay(3000)  # Display "GAME OVER" for 3 seconds
+            run = False
 
     pygame.quit()
 
 if __name__ == "__main__":
     main()
+
