@@ -11,7 +11,13 @@ VEL = 5
 
 CHEF_WIDTH, CHEF_HEIGHT = 70, 90
 BOMB_WIDTH, BOMB_HEIGHT = 50, 50
-ORANGE_WIDTH, ORANGE_HEIGHT = 35, 35
+ORANGE_WIDTH, ORANGE_HEIGHT = 32, 32
+WATERMELON_WIDTH, WATERMELON_HEIGHT = 40, 40
+PINEAPPLE_WIDTH, PINEAPPLE_HEIGHT = 38, 38
+BANANA_WIDTH, BANANA_HEIGHT = 38, 38
+STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 25, 25
+
+
 
 CHEF_IMAGE = pygame.image.load(os.path.join('Assets', 'Chef2.gif'))
 CHEF_SPRITE = pygame.transform.scale(CHEF_IMAGE, (CHEF_WIDTH, CHEF_HEIGHT))
@@ -23,6 +29,39 @@ ORANGE_IMAGE = pygame.image.load(os.path.join('Assets', 'orange.png'))
 ORANGE_SPRITE = pygame.transform.scale(ORANGE_IMAGE, (ORANGE_WIDTH, ORANGE_HEIGHT))
 
 BG_IMAGE = pygame.image.load(os.path.join('Assets', 'kitchen_floor.png'))
+
+WATERMELON_IMAGE =  pygame.image.load(os.path.join('Assets', 'watermelon.png'))
+
+
+STRAWBERRY_IMAGE = pygame.image.load(os.path.join('Assets', 'strawberry.png'))
+
+
+PINEAPPLE_IMAGE = pygame.image.load(os.path.join('Assets', 'pineapple.png'))
+
+
+BANANA_IMAGE = pygame.image.load(os.path.join('Assets', 'banana.png'))
+
+
+
+class Chef:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = CHEF_WIDTH
+        self.height = CHEF_HEIGHT
+
+    def move(self, keys_pressed):
+        if keys_pressed[pygame.K_a]:
+            self.x -= VEL
+        if keys_pressed[pygame.K_d]:
+            self.x += VEL
+        if keys_pressed[pygame.K_w]:
+            self.y -= VEL
+        if keys_pressed[pygame.K_s]:
+            self.y += VEL
+
+    def draw(self):
+        WIN.blit(CHEF_SPRITE, (self.x, self.y))
 
 class Fruit:
     def __init__(self, image, width, height, speed):
@@ -72,15 +111,15 @@ class Bomb:
             bomb.move()
             WIN.blit(bomb.image, (bomb.x, bomb.y))
 
-def draw_window(chef_position, bomb, orange):
+def draw_window(chef, bomb, orange):
     WIN.blit(BG_IMAGE, (0, 0))
-    WIN.blit(CHEF_SPRITE, (chef_position.x, chef_position.y))
+    chef.draw()
     bomb.draw()
     orange.draw()
     pygame.display.update()
 
 def main():
-    chef_position = pygame.Rect(100, 200, CHEF_WIDTH, CHEF_HEIGHT)
+    chef = Chef(100, 200)
     bomb = Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5)
     orange = Fruit(ORANGE_IMAGE, ORANGE_WIDTH, ORANGE_HEIGHT, 3)
 
@@ -93,14 +132,7 @@ def main():
                 run = False
 
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_a]:
-            chef_position.x -= VEL
-        if keys_pressed[pygame.K_d]:
-            chef_position.x += VEL
-        if keys_pressed[pygame.K_w]:
-            chef_position.y -= VEL
-        if keys_pressed[pygame.K_s]:
-            chef_position.y += VEL
+        chef.move(keys_pressed)
 
         bomb.move()
         orange.move()
@@ -116,7 +148,7 @@ def main():
             orange.spawn_fruit()
             orange.spawn_timer = uniform(0.25, 0.5)
 
-        draw_window(chef_position, bomb, orange)
+        draw_window(chef, bomb, orange)
 
     pygame.quit()
 
