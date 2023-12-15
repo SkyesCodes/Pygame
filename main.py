@@ -16,7 +16,7 @@ ORANGE_WIDTH, ORANGE_HEIGHT = 32, 32
 WATERMELON_WIDTH, WATERMELON_HEIGHT = 40, 40
 PINEAPPLE_WIDTH, PINEAPPLE_HEIGHT = 38, 38
 BANANA_WIDTH, BANANA_HEIGHT = 38, 38
-STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 15, 15
+STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 25, 25
 
 CHEF_IMAGE = pygame.image.load(os.path.join('Assets', 'Chef2.gif'))
 CHEF_SPRITE = pygame.transform.scale(CHEF_IMAGE, (CHEF_WIDTH, CHEF_HEIGHT))
@@ -27,13 +27,9 @@ BOMB_SPRITE = pygame.transform.scale(BOMB_IMAGE, (BOMB_WIDTH, BOMB_HEIGHT))
 BG_IMAGE = pygame.image.load(os.path.join('Assets', 'kitchen_floor.png'))
 
 ORANGE_IMAGE = pygame.image.load(os.path.join('Assets', 'orange.png'))
-
 WATERMELON_IMAGE = pygame.image.load(os.path.join('Assets', 'watermelon.png'))
-
 STRAWBERRY_IMAGE = pygame.image.load(os.path.join('Assets', 'strawberry.png'))
-
 PINEAPPLE_IMAGE = pygame.image.load(os.path.join('Assets', 'pineapple.png'))
-
 BANANA_IMAGE = pygame.image.load(os.path.join('Assets', 'banana.png'))
 
 class Chef:
@@ -42,6 +38,11 @@ class Chef:
         self.y = y
         self.width = CHEF_WIDTH
         self.height = CHEF_HEIGHT
+        self.hitbox_scale_horizontal = 0.80  # 15% smaller horizontally
+        self.hitbox_scale_vertical = 0.70  # 25% smaller vertically
+        self.hitbox_width = int(self.width * self.hitbox_scale_horizontal)
+        self.hitbox_height = int(self.height * self.hitbox_scale_vertical)
+        self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
 
     def move(self, keys_pressed):
         if keys_pressed[pygame.K_a]:
@@ -52,6 +53,7 @@ class Chef:
             self.y -= VEL
         if keys_pressed[pygame.K_s]:
             self.y += VEL
+        self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
 
     def draw(self):
         WIN.blit(CHEF_SPRITE, (self.x, self.y))
@@ -65,12 +67,14 @@ class Fruit:
         self.speed = speed
         self.spawn_timer = uniform(0.25, 0.5)
         self.fruits_on_screen = []
+        self.hitbox = pygame.Rect(self.x, self.y, width, height)
 
     def move(self):
         self.x -= self.speed
         if self.x <= 0:
             self.x = WIDTH
             self.y = randrange(HEIGHT)
+        self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
     def spawn_fruit(self):
         if len(self.fruits_on_screen) < 10:
@@ -89,12 +93,14 @@ class Bomb:
         self.speed = speed
         self.spawn_timer = uniform(0.25, 0.5)
         self.bombs_on_screen = []
+        self.hitbox = pygame.Rect(self.x, self.y, width, height)
 
     def move(self):
         self.x -= self.speed
         if self.x <= 0:
             self.x = WIDTH
             self.y = randrange(HEIGHT)
+        self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
     def spawn_bomb(self):
         if len(self.bombs_on_screen) < 5:
@@ -111,6 +117,18 @@ def draw_window(chef, bomb, fruit):
     bomb.draw()
     fruit.draw()
     pygame.display.update()
+
+def check_collision(chef, bomb, fruit):
+    chef_rect = pygame.Rect(chef.hitbox.x, chef.hitbox.y, chef.hitbox.width, chef.hitbox.height)
+    for bomb_instance in bomb.bombs_on_screen:
+        bomb_rect = pygame.Rect(bomb_instance.hitbox.x, bomb_instance.hitbox.y, bomb_instance.hitbox.width, bomb_instance.hitbox.height)
+        if chef_rect.colliderect(bomb_rect):
+            bomb.bombs_on_screen.remove(bomb_instance)
+
+    for fruit_instance in fruit.fruits_on_screen:
+        fruit_rect = pygame.Rect(fruit_instance.hitbox.x, fruit_instance.hitbox.y, fruit_instance.hitbox.width, fruit_instance.hitbox.height)
+        if chef_rect.colliderect(fruit_rect):
+            fruit.fruits_on_screen.remove(fruit_instance)
 
 def main():
     chef = Chef(100, 200)
@@ -142,6 +160,7 @@ def main():
             fruit.spawn_fruit()
             fruit.spawn_timer = uniform(0.25, 0.5)
 
+        check_collision(chef, bomb, fruit)
         draw_window(chef, bomb, fruit)
 
     pygame.quit()
