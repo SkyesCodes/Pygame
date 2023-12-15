@@ -46,20 +46,28 @@ class Chef:
         self.hitbox_height = int(self.height * self.hitbox_scale_vertical)
         self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
         self.score = 0
+        self.lives = 3
+        self.game_over = False
 
     def move(self, keys_pressed):
-        if keys_pressed[pygame.K_a]:
-            self.x -= VEL
-        if keys_pressed[pygame.K_d]:
-            self.x += VEL
-        if keys_pressed[pygame.K_w]:
-            self.y -= VEL
-        if keys_pressed[pygame.K_s]:
-            self.y += VEL
-        self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
+        if not self.game_over:
+            if keys_pressed[pygame.K_a]:
+                self.x -= VEL
+            if keys_pressed[pygame.K_d]:
+                self.x += VEL
+            if keys_pressed[pygame.K_w]:
+                self.y -= VEL
+            if keys_pressed[pygame.K_s]:
+                self.y += VEL
+            self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
 
     def draw(self):
         WIN.blit(CHEF_SPRITE, (self.x, self.y))
+
+    def lose_life(self):
+        self.lives -= 1
+        if self.lives == 0:
+            self.game_over = True
 
 class Fruit:
     def __init__(self, images, width, height, speed, points):
@@ -68,7 +76,7 @@ class Fruit:
         self.images = [pygame.transform.scale(img, (width, height)) for img in images]
         self.image = choice(self.images)
         self.speed = speed
-        self.points = points
+        self.points = choice(points)
         self.spawn_timer = uniform(0.25, 0.5)
         self.fruits_on_screen = []
         self.hitbox = pygame.Rect(self.x, self.y, width, height)
@@ -80,8 +88,8 @@ class Fruit:
             self.y = randrange(HEIGHT)
         self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def spawn_fruit(self):
-        if len(self.fruits_on_screen) < 10:
+    def spawn_fruit(self, chef):
+        if not chef.game_over and len(self.fruits_on_screen) < 10:
             self.fruits_on_screen.append(Fruit([ORANGE_IMAGE, WATERMELON_IMAGE, STRAWBERRY_IMAGE, PINEAPPLE_IMAGE, BANANA_IMAGE], 38, 38, 3, [10, 20, 5, 15, 15]))
 
     def draw(self):
@@ -106,8 +114,8 @@ class Bomb:
             self.y = randrange(HEIGHT)
         self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def spawn_bomb(self):
-        if len(self.bombs_on_screen) < 5:
+    def spawn_bomb(self, chef):
+        if not chef.game_over and len(self.bombs_on_screen) < 5:
             self.bombs_on_screen.append(Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5))
 
     def draw(self):
@@ -122,21 +130,26 @@ def draw_window(chef, bomb, fruit):
     fruit.draw()
     font = pygame.font.Font(None, 36)
     score_text = font.render(f"Score: {chef.score}", True, (255, 255, 255))
-    WIN.blit(score_text, (WIDTH - 150, 10))
+    WIN.blit(score_text, (WIDTH - score_text.get_width() - 10, 10))
+    if not chef.game_over:
+        for i in range(chef.lives):
+            pygame.draw.circle(WIN, (0, 255, 0), (WIDTH - 50 - 30 * i, 30), 15)
+    else:
+        font = pygame.font.Font(None, 74)
+        game_over_text = font.render("GAME OVER", True, (255, 0, 0))
+        WIN.blit(game_over_text, ((WIDTH - game_over_text.get_width()) // 2, HEIGHT // 3))
     pygame.display.update()
 
 def check_collision(chef, bomb, fruit):
-    chef_rect = pygame.Rect(chef.hitbox.x, chef.hitbox.y, chef.hitbox.width, chef.hitbox.height)
-    for bomb_instance in bomb.bombs_on_screen:
-        bomb_rect = pygame.Rect(bomb_instance.hitbox.x, bomb_instance.hitbox.y, bomb_instance.hitbox.width, bomb_instance.hitbox.height)
-        if chef_rect.colliderect(bomb_rect):
+    for fruit_instance in fruit.fruits_on_screen[:]:
+        if chef.hitbox.colliderect(fruit_instance.hitbox):
+            chef.score += fruit_instance.points
+            fruit.fruits_on_screen.remove(fruit_instance)
+    for bomb_instance in bomb.bombs_on_screen[:]:
+        if chef.hitbox.colliderect(bomb_instance.hitbox):
+            chef.lives -= 1
             bomb.bombs_on_screen.remove(bomb_instance)
 
-    for fruit_instance in fruit.fruits_on_screen:
-        fruit_rect = pygame.Rect(fruit_instance.hitbox.x, fruit_instance.hitbox.y, fruit_instance.hitbox.width, fruit_instance.hitbox.height)
-        if chef_rect.colliderect(fruit_rect):
-            chef.score += fruit_instance.points[fruit_instance.images.index(fruit_instance.image)]
-            fruit.fruits_on_screen.remove(fruit_instance)
 
 def main():
     chef = Chef(100, 200)
@@ -161,11 +174,11 @@ def main():
         fruit.spawn_timer -= 1 / FPS
 
         if bomb.spawn_timer <= 0:
-            bomb.spawn_bomb()
+            bomb.spawn_bomb(chef)
             bomb.spawn_timer = uniform(0.25, 0.5)
 
         if fruit.spawn_timer <= 0:
-            fruit.spawn_fruit()
+            fruit.spawn_fruit(chef)
             fruit.spawn_timer = uniform(0.25, 0.5)
 
         check_collision(chef, bomb, fruit)
