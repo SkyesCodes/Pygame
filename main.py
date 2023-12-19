@@ -40,8 +40,8 @@ class Chef:
         self.y = y
         self.width = CHEF_WIDTH
         self.height = CHEF_HEIGHT
-        self.hitbox_scale_horizontal = 0.80
-        self.hitbox_scale_vertical = 0.70
+        self.hitbox_scale_horizontal = 0.70
+        self.hitbox_scale_vertical = 0.60
         self.hitbox_width = int(self.width * self.hitbox_scale_horizontal)
         self.hitbox_height = int(self.height * self.hitbox_scale_vertical)
         self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
@@ -140,6 +140,19 @@ def draw_window(chef, bomb, fruit):
         WIN.blit(game_over_text, ((WIDTH - game_over_text.get_width()) // 2, HEIGHT // 3))
     pygame.display.update()
 
+def draw_start_screen():
+    WIN.blit(BG_IMAGE, (0, 0))
+    font_title = pygame.font.Font(None, 74)
+    title_text = font_title.render("CITRUS SLICER", True, (255, 165, 0))  # Orange color
+    WIN.blit(title_text, ((WIDTH - title_text.get_width()) // 2, HEIGHT // 3))
+
+    # Draw start button
+    pygame.draw.rect(WIN, (0, 255, 0), (WIDTH // 2 - 75, HEIGHT // 2, 150, 50))  # Green color
+    font_button = pygame.font.Font(None, 36)
+    button_text = font_button.render("START", True, (0, 0, 0))  # Black color
+    WIN.blit(button_text, ((WIDTH - button_text.get_width()) // 2, HEIGHT // 2 + 10))
+
+    pygame.display.update()
 
 def check_collision(chef, bomb, fruit):
     for fruit_instance in fruit.fruits_on_screen[:]:
@@ -152,13 +165,26 @@ def check_collision(chef, bomb, fruit):
             chef.lives -= 1
             bomb.bombs_on_screen.remove(bomb_instance)
 
-
 def main():
     chef = Chef(100, 200)
     bomb = Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5)
     fruit = Fruit([ORANGE_IMAGE, WATERMELON_IMAGE, STRAWBERRY_IMAGE, PINEAPPLE_IMAGE, BANANA_IMAGE], 38, 38, 3, [10, 20, 5, 15, 15])
 
     clock = pygame.time.Clock()
+    start_screen = True
+
+    while start_screen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start_screen = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                if WIDTH // 2 - 75 <= x <= WIDTH // 2 + 75 and HEIGHT // 2 <= y <= HEIGHT // 2 + 50:
+                    start_screen = False
+
+        draw_start_screen()
+
     run = True
     while run:
         clock.tick(FPS)
@@ -203,4 +229,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
