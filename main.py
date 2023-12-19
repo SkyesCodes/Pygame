@@ -133,12 +133,13 @@ def draw_window(chef, bomb, fruit):
     WIN.blit(score_text, (WIDTH - score_text.get_width() - 10, 10))
     if not chef.game_over:
         for i in range(chef.lives):
-            pygame.draw.circle(WIN, (0, 255, 0), (WIDTH - 50 - 30 * i, 30), 15)
+            pygame.draw.circle(WIN, (0, 255, 0), (int(WIDTH / 2) - 30 * i, 30), 15)
     else:
         font = pygame.font.Font(None, 74)
         game_over_text = font.render("GAME OVER", True, (255, 0, 0))
         WIN.blit(game_over_text, ((WIDTH - game_over_text.get_width()) // 2, HEIGHT // 3))
     pygame.display.update()
+
 
 def check_collision(chef, bomb, fruit):
     for fruit_instance in fruit.fruits_on_screen[:]:
