@@ -123,6 +123,24 @@ class Bomb:
             bomb.move()
             WIN.blit(bomb.image, (bomb.x, bomb.y))
 
+def increase_difficulty(bomb, fruit, clock):
+    if int(pygame.time.get_ticks() / 1000) % 30 == 0:
+        if len(bomb.bombs_on_screen) < 5:
+            bomb.spawn_bomb(chef)
+        if len(fruit.fruits_on_screen) < 10:
+            fruit.spawn_fruit(chef)
+
+def check_collision(chef, bomb, fruit):
+    for fruit_instance in fruit.fruits_on_screen[:]:
+        if chef.hitbox.colliderect(fruit_instance.hitbox):
+            chef.score += fruit_instance.points
+            fruit.fruits_on_screen.remove(fruit_instance)
+
+    for bomb_instance in bomb.bombs_on_screen[:]:
+        if chef.hitbox.colliderect(bomb_instance.hitbox):
+            chef.lives -= 1
+            bomb.bombs_on_screen.remove(bomb_instance)
+
 def draw_window(chef, bomb, fruit):
     WIN.blit(BG_IMAGE, (0, 0))
     chef.draw()
@@ -154,17 +172,6 @@ def draw_start_screen():
 
     pygame.display.update()
 
-def check_collision(chef, bomb, fruit):
-    for fruit_instance in fruit.fruits_on_screen[:]:
-        if chef.hitbox.colliderect(fruit_instance.hitbox):
-            chef.score += fruit_instance.points
-            fruit.fruits_on_screen.remove(fruit_instance)
-
-    for bomb_instance in bomb.bombs_on_screen[:]:
-        if chef.hitbox.colliderect(bomb_instance.hitbox):
-            chef.lives -= 1
-            bomb.bombs_on_screen.remove(bomb_instance)
-
 def main():
     chef = Chef(100, 200)
     bomb = Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5)
@@ -186,6 +193,8 @@ def main():
         draw_start_screen()
 
     run = True
+    spawn_timer = 30  # Set initial spawn timer to 30 seconds
+
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -201,6 +210,8 @@ def main():
 
             bomb.spawn_timer -= 1 / FPS
             fruit.spawn_timer -= 1 / FPS
+
+            increase_difficulty(bomb, fruit, clock)
 
             if bomb.spawn_timer <= 0:
                 bomb.spawn_bomb(chef)
