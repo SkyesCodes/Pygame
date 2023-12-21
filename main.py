@@ -18,7 +18,7 @@ PINEAPPLE_WIDTH, PINEAPPLE_HEIGHT = 38, 38
 BANANA_WIDTH, BANANA_HEIGHT = 38, 38
 STRAWBERRY_WIDTH, STRAWBERRY_HEIGHT = 25, 25
 
-CHEF_IMAGE = pygame.image.load(os.path.join('Assets', 'Chef2.gif'))
+CHEF_IMAGE = pygame.image.load(os.path.join('Assets', 'chef3_nobg.png'))
 CHEF_SPRITE = pygame.transform.scale(CHEF_IMAGE, (CHEF_WIDTH, CHEF_HEIGHT))
 
 BOMB_IMAGE = pygame.image.load(os.path.join('Assets', 'bomb.png'))
@@ -41,7 +41,7 @@ class Chef:
         self.width = CHEF_WIDTH
         self.height = CHEF_HEIGHT
         self.hitbox_scale_horizontal = 0.70
-        self.hitbox_scale_vertical = 0.60
+        self.hitbox_scale_vertical = 0.50
         self.hitbox_width = int(self.width * self.hitbox_scale_horizontal)
         self.hitbox_height = int(self.height * self.hitbox_scale_vertical)
         self.hitbox = pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
