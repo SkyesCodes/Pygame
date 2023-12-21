@@ -7,7 +7,7 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Citrus Slicer!")
 
 FPS = 60
-VEL = 5
+VEL = 4.5
 
 CHEF_WIDTH, CHEF_HEIGHT = 70, 90
 BOMB_WIDTH, BOMB_HEIGHT = 50, 50
