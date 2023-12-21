@@ -88,9 +88,14 @@ class Fruit:
             self.y = randrange(HEIGHT)
         self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def spawn_fruit(self, chef):
-        if not chef.game_over and len(self.fruits_on_screen) < 10:
+    def spawn_fruit(self, chef, max_fruits):
+        if not chef.game_over and len(self.fruits_on_screen) < max_fruits:
             self.fruits_on_screen.append(Fruit([ORANGE_IMAGE, WATERMELON_IMAGE, STRAWBERRY_IMAGE, PINEAPPLE_IMAGE, BANANA_IMAGE], 38, 38, 3, [10, 20, 5, 15, 15]))
+
+    def update_spawn_timer(self, elapsed_time):
+        self.spawn_timer -= 1 / FPS
+        if self.spawn_timer <= 0:
+            self.spawn_timer = uniform(0.25, 0.5)
 
     def draw(self):
         for fruit in self.fruits_on_screen:
@@ -114,21 +119,31 @@ class Bomb:
             self.y = randrange(HEIGHT)
         self.hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-    def spawn_bomb(self, chef):
-        if not chef.game_over and len(self.bombs_on_screen) < 5:
+    def spawn_bomb(self, chef, max_bombs):
+        if not chef.game_over and len(self.bombs_on_screen) < max_bombs:
             self.bombs_on_screen.append(Bomb(BOMB_IMAGE, BOMB_WIDTH, BOMB_HEIGHT, 5))
+
+    def update_spawn_timer(self, elapsed_time):
+        self.spawn_timer -= 1 / FPS
+        if self.spawn_timer <= 0:
+            self.spawn_timer = uniform(0.25, 0.5)
 
     def draw(self):
         for bomb in self.bombs_on_screen:
             bomb.move()
             WIN.blit(bomb.image, (bomb.x, bomb.y))
 
-def increase_difficulty(bomb, fruit, clock):
-    if int(pygame.time.get_ticks() / 1000) % 30 == 0:
-        if len(bomb.bombs_on_screen) < 5:
-            bomb.spawn_bomb(chef)
-        if len(fruit.fruits_on_screen) < 10:
-            fruit.spawn_fruit(chef)
+def increase_difficulty(chef, bomb, fruit, elapsed_time):
+    time_interval = 30  # Increase difficulty every 30 seconds
+
+    max_bombs = min(2 + int(elapsed_time / time_interval), 5)
+    max_fruits = min(5 + int(elapsed_time / time_interval), 10)
+
+    bomb.spawn_bomb(chef, max_bombs)
+    bomb.update_spawn_timer(elapsed_time)
+
+    fruit.spawn_fruit(chef, max_fruits)
+    fruit.update_spawn_timer(elapsed_time)
 
 def check_collision(chef, bomb, fruit):
     for fruit_instance in fruit.fruits_on_screen[:]:
@@ -193,10 +208,12 @@ def main():
         draw_start_screen()
 
     run = True
-    spawn_timer = 30  # Set initial spawn timer to 30 seconds
+    elapsed_time = 0  # Initialize elapsed time
 
     while run:
         clock.tick(FPS)
+        elapsed_time += 1 / FPS  # Update elapsed time
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -208,18 +225,10 @@ def main():
             bomb.move()
             fruit.move()
 
-            bomb.spawn_timer -= 1 / FPS
-            fruit.spawn_timer -= 1 / FPS
+            bomb.update_spawn_timer(elapsed_time)
+            fruit.update_spawn_timer(elapsed_time)
 
-            increase_difficulty(bomb, fruit, clock)
-
-            if bomb.spawn_timer <= 0:
-                bomb.spawn_bomb(chef)
-                bomb.spawn_timer = uniform(0.25, 0.5)
-
-            if fruit.spawn_timer <= 0:
-                fruit.spawn_fruit(chef)
-                fruit.spawn_timer = uniform(0.25, 0.5)
+            increase_difficulty(chef, bomb, fruit, elapsed_time)
 
             check_collision(chef, bomb, fruit)
         else:
