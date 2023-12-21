@@ -25,7 +25,7 @@
 - make either the area the fruit is in, or the fruit themselves clickable, as well as bombs. 
 - Game will track score
 - Will track lives, ending the game when you run out of them.
-- Game will end after a 5 minute timer to allow for highscore attempts, but no run endlessly
+
 
 
 ## Stretch goals
@@ -58,6 +58,13 @@
 - Virtual Studio Code
 - python
 - pygame
-- potentially other resources (especially for the art), not sure yet and will update.
+
+## GAME UPDATE
+- I decided to take a slightly different direction with the game. Instead of 3 seperate lanes I randomly spawn fruit all over the window, starting slow and picking up over time. I kept the concpet of bombs but made the same change to them. Instead of clicking on fruit the objective of the game is now to collect fruit with your character and avoid bombs the best you can. Fruits are worth varrying amounts of points, and bombs will take away 1 of your 3 lives. When 3 lives are lost the game is over and the window will close. Score as many points as you can before you run out of lives!
+
+## Screenshots
+![Start Screen](https://imgur.com/t9CpBhW.png)
+![Gameplay](https://imgur.com/0vGLzSe.png)
+![Game Over](https://imgur.com/Elvohrr.png)
 
 
